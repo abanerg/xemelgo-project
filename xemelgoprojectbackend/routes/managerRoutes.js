@@ -35,7 +35,7 @@ router.post('/new-user', async function(req, res, next) {
     const response = await manager.newUser(req.body);
     res.json(response);
   } catch (err) {
-    console.error(`Error while getting employee worklog`, err.message);
+    console.error(`Error while creating new user`, err.message);
     next(err);
   }
 });
