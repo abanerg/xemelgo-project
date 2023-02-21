@@ -3,6 +3,7 @@ import { Button, Form, Table } from 'react-bootstrap';
 import axios from 'axios';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import managerHelper from './managerHelper'
+import { ExportToCsv } from 'export-to-csv';
 
 
 const dayjs = require('dayjs')
@@ -61,9 +62,33 @@ class ManagerPage extends Component {
                 for (var i = 0; i < jobs.length; i++) {
                     totalJobTime += managerHelper.timeWorked(jobs[i].job_start, jobs[i].job_end);
                 }
-                ret.push(<div style={{ display: "flex", justifyContent: "center", marginTop: "5px" }}>Total Work Time: {totalWorkTime.toFixed(2)} hours.</div>);
-                ret.push(<div style={{ display: "flex", justifyContent: "center", marginTop: "5px" }}>Total Job Time: {totalJobTime.toFixed(2)} hours.</div>);
-                ret.push(<div style={{ display: "flex", justifyContent: "center", marginTop: "5px" }}>Total Effiency: {((totalJobTime / totalWorkTime) * 100).toFixed(2)}%</div>);
+                ret.push(<div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>Total Work Time: {totalWorkTime.toFixed(2)} hours.</div>);
+                ret.push(<div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>Total Job Time: {totalJobTime.toFixed(2)} hours.</div>);
+                ret.push(<div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}>Total Effiency: {((totalJobTime / totalWorkTime) * 100).toFixed(2)}%</div>);
+                ret.push(<div style={{ display: "flex", justifyContent: "center", marginTop: "10px" }}><Button onClick={
+                    () => {
+                        var data = [{
+                            totalWorkTime: totalWorkTime,
+                            totalJobTime: totalJobTime,
+                            effiency: (totalJobTime / totalWorkTime)
+                        }];
+                        const options = {
+                            fieldSeparator: ',',
+                            quoteStrings: '"',
+                            decimalSeparator: '.',
+                            showLabels: true,
+                            showTitle: true,
+                            title: 'Worklog for employee #'+this.state.currentEmployeeId+" on "+this.state.currentDate,
+                            useTextFile: false,
+                            useBom: true,
+                            useKeysAsHeaders: true,
+                        };
+
+                        const csvExporter = new ExportToCsv(options);
+
+                        csvExporter.generateCsv(data);
+                    }
+                }>Download csv</Button></div>)
                 return ret;
             }
         }
@@ -89,7 +114,7 @@ class ManagerPage extends Component {
                     <h3>Hello, {this.state.name} {this.state.lastname}</h3>
                 </div>
                 <div><Button style={{ float: "right", marginRight: "60px" }} onClick={this.props.logOutFunc}><h4>Log out</h4></Button></div>
-                <div style={{display: "flex", justifyContent: "center", width: '300px', marginTop: "20px", marginLeft: "40px" }}><Table bordered hover size="sm" striped="columns" >
+                <div style={{ display: "flex", justifyContent: "center", width: '300px', marginTop: "20px", marginLeft: "40px" }}><Table bordered hover size="sm" striped="columns" >
                     <thead>
                         <tr>
                             <th>Employee #</th>
@@ -119,7 +144,7 @@ class ManagerPage extends Component {
                     </Form>
 
                 </div>
-                    {this.worklogGenerator()}
+                {this.worklogGenerator()}
             </>
         );
     }
